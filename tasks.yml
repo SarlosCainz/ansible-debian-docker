@@ -37,7 +37,10 @@
 
     - name: Install pip3
       apt:
-        name: python3-pip
+        name: "{{ item }}"
+      with_list:
+        - python3-pip
+        - nfs-common
 
     - name: Install Python docker support.
       pip:
