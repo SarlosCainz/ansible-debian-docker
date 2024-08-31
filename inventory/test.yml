@@ -1,6 +1,5 @@
 all:
   hosts:
-    docker:
-      ansible_become_method: su
+    orb:
+      ansible_become_method: sudo
       ansible_python_interpreter: /usr/bin/python3
-

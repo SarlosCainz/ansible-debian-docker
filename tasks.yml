@@ -1,16 +1,6 @@
 - hosts: all
-  become: yes
-  become_method: su
   vars:
-    ansible_python_interpreter: /usr/bin/python3
     docker_dir: /opt/docker
-    ansible_become_password: !vault |
-      $ANSIBLE_VAULT;1.1;AES256
-      38313631623661343861633266383630323239633061363466653862666437386130393939343132
-      6634326635653563396161663135616638663537363362300a376238333964323231656133303066
-      66653131313231316238636634333163346162626461633239306661313433643635316666323235
-      6634313831643562370a343533303035636536326333303537666465336235653131636332336438
-      6262
   tasks:
     - name: stat /usr/bin/docker
       stat:
@@ -28,30 +18,19 @@
       shell: "{{ reg_get_docker.content}}"
       register: installDocker
       when: not reg_docker.stat.exists
+      become: yes
 
     - name: add docker group to user
       user:
         name: "{{ ansible_user_id }}"
         groups: docker
         append: yes
-
-    - name: Install pip3
-      apt:
-        name: "{{ item }}"
-      with_list:
-        - python3-pip
-        - nfs-common
-
-    - name: Install Python docker support.
-      pip:
-        name:
-          - docker
-          - docker-compose
+      become: yes
 
     - name: Create docker directory.
       file:
         path: "{{ docker_dir }}"
         state: directory
         mode: 0775
-        owner: root
         group: docker
+      become: yes
